@@ -364,6 +364,69 @@ manager.onTyping(({ key, event }) => {
 
 ---
 
+## Theories & Concepts
+
+`@keybindy/core` is designed to provide a flexible and powerful foundation for keyboard shortcut management. This section outlines the core ideas and keybinding types supported by the library.
+
+#### Keybinding Types Supported
+
+We support two primary types of key combinations:
+
+##### 1. Sequential Key Combos
+
+These are keybindings where the user presses keys one after another, like:
+
+```txt
+g → h
+```
+
+This style is commonly seen in editors like Vim or platforms like GitHub, where pressing g followed by h might trigger navigation (e.g., go to the homepage).
+
+- Supported out of the box
+- Timeout configurable between key presses.
+  - `sequenceDelay:` Sets the max time (in ms) allowed between keys.
+- Sequence memory is reset on timeout or invalid input
+
+```ts
+manager.register(
+  ...,
+  ...,
+  {
+    sequential: true,
+    sequenceDelay: 1000
+  });
+```
+
+##### 2. Simultaneous Key Combos
+
+These are triggered when multiple keys are held down together, like:
+
+```txt
+Ctrl + K
+Meta + Shift + P
+```
+
+Perfect for standard "shortcut-style" commands that fire instantly when all keys are down at once.
+
+```ts
+manager.register(
+  ...,
+  ...
+);
+```
+
+#### Alias Support
+
+`@keybindy/core` supports aliasing of platform-specific key variations, so your shortcuts work consistently across different operating systems and keyboard layouts:
+
+- `ctrl (left)` / `ctrl (right)` → `ctrl`
+- `shift (left)` / `shift (right)` → `shift`
+- `alt (left)` / `alt (right)` → `alt`
+- `meta (left)` / `meta (right)` → `meta`
+- `cmd` → `meta`
+
+---
+
 ## Ecosystem
 
 Keybindy has modular packages for different platforms. Each package is built to work seamlessly with the core engine.

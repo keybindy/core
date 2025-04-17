@@ -126,6 +126,30 @@ export class ShortcutManager extends ScopeManager {
             continue;
           }
 
+          if (seq.buffer.length > 1) {
+            let minGap = Infinity;
+            for (let i = 1; i < seq.buffer.length; i++) {
+              const gap = seq.buffer[i].time - seq.buffer[i - 1].time;
+              if (gap < minGap) minGap = gap;
+            }
+
+            // Avoid treating simultaneous press as sequential
+            const MIN_SEQUENTIAL_GAP = 100;
+            if (minGap < MIN_SEQUENTIAL_GAP) {
+              this.clearSequence(seq.keys);
+              continue;
+            }
+          }
+
+          // Prevent firing sequential if keys are still pressed
+          if (
+            pressedSeq.length === expected.length &&
+            pressedSeq.every(k => this.pressedKeys.has(k))
+          ) {
+            this.clearSequence(seq.keys);
+            continue;
+          }
+
           if (isMatch && expected.length === pressedSeq.length) {
             if (options.preventDefault) e.preventDefault();
             handler(e);
@@ -137,7 +161,12 @@ export class ShortcutManager extends ScopeManager {
       } else {
         // Simultaneous key check
         const allMatch = expected.every(k => this.pressedKeys.has(k));
-        if (allMatch) {
+
+        const matchingSequential = this.activeSequences.find(
+          seq => JSON.stringify(seq.keys) === JSON.stringify(expected)
+        );
+
+        if (allMatch && !matchingSequential) {
           if (options?.preventDefault) e.preventDefault();
           handler(e);
           this.onShortcutFired(shortcut);
@@ -199,7 +228,8 @@ export class ShortcutManager extends ScopeManager {
         this.shortcuts = this.shortcuts.filter(
           s =>
             JSON.stringify(s.keys) !== JSON.stringify(normalized) ||
-            s.options?.scope !== (options?.scope || this.getActiveScope())
+            s.options?.scope !== (options?.scope || this.getActiveScope()) ||
+            s.id !== id
         );
 
         this.shortcuts.push({

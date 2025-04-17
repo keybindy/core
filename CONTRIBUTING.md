@@ -10,8 +10,12 @@ We welcome all kinds of contributions — code, documentation, bug reports, feat
 Click the **Fork** button on GitHub, then clone your fork:
 
 ```bash
+# Create a directory for the packages
+mkdir @keybindy
+cd @keybindy
 # Clone your fork
-git clone https://github.com/your-username/keybindy.git cd keybindy
+git clone https://github.com/your-username/core.git
+cd core
 ```
 
 ### 2. Install Dependencies
